@@ -1,0 +1,42 @@
+# Clone the git repository
+# All the code used in this codelab is contained in this git repository. Clone the repository and cd into it. 
+git clone https://github.com/googlecodelabs/tensorflow-for-poets-2
+cd tensorflow-for-poets-2
+
+# Download the training images
+curl http://download.tensorflow.org/example_images/flower_photos.tgz \
+    | tar xz -C tf_files
+    
+# Training the network & run the training
+IMAGE_SIZE=224
+ARCHITECTURE="mobilenet_0.50_${IMAGE_SIZE}"
+python -m scripts.retrain \
+  --bottleneck_dir=tf_files/bottlenecks \
+  --how_many_training_steps=500 \
+  --model_dir=tf_files/models/ \
+  --summaries_dir=tf_files/training_summaries/"${ARCHITECTURE}" \
+  --output_graph=tf_files/retrained_graph.pb \
+  --output_labels=tf_files/retrained_labels.txt \
+  --architecture="${ARCHITECTURE}" \
+  --image_dir=tf_files/flower_photos
+
+# This retraining command iterates only 500 times. You can get improved results by training for longer.
+# To get this improvement, run the following code instead
+python -m scripts.retrain \
+  --bottleneck_dir=tf_files/bottlenecks \
+  --model_dir=tf_files/models/"${ARCHITECTURE}" \
+  --summaries_dir=tf_files/training_summaries/"${ARCHITECTURE}" \
+  --output_graph=tf_files/retrained_graph.pb \
+  --output_labels=tf_files/retrained_labels.txt \
+  --architecture="${ARCHITECTURE}" \
+  --image_dir=tf_files/flower_photos
+  
+# Getting the result
+python -m scripts.label_image \
+    --graph=tf_files/retrained_graph.pb  \
+    --image=tf_files/flower_photos/daisy/506348009_9ecff8b6ef.jpg
+    
+    
+python -m scripts.label_image \
+    --graph=tf_files/retrained_graph.pb  \
+    --image=tf_files/flower_photos/roses/2414954629_3708a1a04d.jpg 
